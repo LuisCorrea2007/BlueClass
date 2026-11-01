@@ -1,0 +1,36 @@
+name: memora-ai
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: memora
+      POSTGRES_USER: memora
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - memora_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U memora -d memora"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    networks: [private]
+  api:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      MEMORA_ENV: production
+      MEMORA_DATABASE_URL: postgresql+psycopg://memora:${POSTGRES_PASSWORD}@db:5432/memora
+      MEMORA_API_TOKEN: ${MEMORA_API_TOKEN:?Set MEMORA_API_TOKEN in .env}
+      MEMORA_ALLOWED_ORIGINS: ${MEMORA_ALLOWED_ORIGINS:-}
+    ports:
+      - "127.0.0.1:8000:8000"
+    networks: [private]
+volumes:
+  memora_pgdata:
+networks:
+  private:
+    internal: true
