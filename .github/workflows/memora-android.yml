@@ -2,7 +2,7 @@ name: MEMORA Android APK
 on:
   push:
     paths:
-      - 'memora-source.zip.b64'
+      - 'android/**'
       - '.github/workflows/memora-android.yml'
   workflow_dispatch:
 jobs:
@@ -10,10 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Restore source archive
-        run: |
-          base64 -d memora-source.zip.b64 > memora-source.zip
-          unzip -oq memora-source.zip -d .
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
