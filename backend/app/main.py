@@ -15,21 +15,35 @@ import secrets
 from .database import Base, engine, get_db
 from .models import Memory, Skill
 
-Base.metadata.create_all(bind=engine)
-app = FastAPI(title="MEMORA AI API", version="0.3.0")
+if os.getenv("MEMORA_ENV", "development").lower() != "production":
+    Base.metadata.create_all(bind=engine)
+app = FastAPI(title="MEMORA AI API", version="0.4.0", docs_url=None if os.getenv("MEMORA_ENV", "development").lower() == "production" else "/docs", redoc_url=None if os.getenv("MEMORA_ENV", "development").lower() == "production" else "/redoc")
 API_TOKEN = os.getenv("MEMORA_API_TOKEN", "").strip()
 ENVIRONMENT = os.getenv("MEMORA_ENV", "development").lower()
 if ENVIRONMENT == "production" and not API_TOKEN:
     raise RuntimeError("MEMORA_API_TOKEN must be configured in production")
 
+allowed_origins = [x.strip() for x in os.getenv("MEMORA_ALLOWED_ORIGINS", "").split(",") if x.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:8000", "http://localhost:8000"],
+    allow_origins=allowed_origins + ["http://127.0.0.1:8000", "http://localhost:8000"],
     allow_origin_regex=r"chrome-extension://[a-zA-Z0-9]+",
     allow_credentials=False,
     allow_methods=["GET", "POST", "DELETE"],
     allow_headers=["Content-Type", "Authorization"],
 )
+
+@app.middleware("http")
+async def security_headers(request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    if ENVIRONMENT == "production":
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    return response
+
 FRONTEND = Path(__file__).resolve().parents[2] / "frontend"
 if FRONTEND.exists():
     app.mount("/assets", StaticFiles(directory=FRONTEND), name="assets")
