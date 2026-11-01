@@ -7,10 +7,11 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers
     healthCheckPath: /api/health
+    autoDeploy: true
     envVars:
       - key: MEMORA_ENV
         value: production
       - key: MEMORA_API_TOKEN
-        sync: false
+        generateValue: true
       - key: MEMORA_DATABASE_URL
         sync: false
