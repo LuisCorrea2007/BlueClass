@@ -6,10 +6,11 @@ android {
     namespace = "ai.memora.mobile"
     compileSdk = 35
     defaultConfig {
-        applicationId = "ai.memora.mobile"
+        // Separate package keeps the already-installed first build and its local memories intact.
+        applicationId = "ai.memora.mobile.sync"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
+        versionCode = 1
         versionName = "0.2.0"
     }
     compileOptions {
