@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "MEMORA AI Capture",
+  "version": "0.2.0",
+  "description": "User-initiated capture of visible AI conversation text.",
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": ["https://chatgpt.com/*", "https://claude.ai/*", "https://gemini.google.com/*"],
+  "action": {"default_popup": "popup.html"},
+  "content_scripts": [{
+    "matches": ["https://chatgpt.com/*", "https://claude.ai/*", "https://gemini.google.com/*"],
+    "js": ["content.js"]
+  }],
+  "optional_host_permissions": ["https://*/*", "http://127.0.0.1:8000/*", "http://localhost:8000/*"]
+}
