@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.content.Intent
 import android.graphics.Color
 import android.view.Gravity
+import android.text.InputType
 import android.widget.*
 import org.json.JSONArray
 import org.json.JSONObject
@@ -36,7 +37,7 @@ class MainActivity : Activity() {
   root.addView(label("✳ MEMORA AI"))
   root.addView(label("Your knowledge, portable"))
   server=field("HTTPS API URL");server.setText(prefs.getString("api_url",""));root.addView(server)
-  token=field("Bearer token (if enabled)");token.setText(prefs.getString("api_token",""));root.addView(token)
+  token=field("Bearer token (if enabled)").apply{inputType=InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD};token.setText(prefs.getString("api_token",""));root.addView(token)
   root.addView(Button(this).apply{text="Save connection";setOnClickListener{prefs.edit().putString("api_url",server.text.toString().trim().trimEnd('/')).putString("api_token",token.text.toString().trim()).apply();status.text="Connection saved."}})
   title=field("Memory title");body=field("Text to remember",true);root.addView(title);root.addView(body)
   val actions=LinearLayout(this).apply{orientation=0}
