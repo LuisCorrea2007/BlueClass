@@ -1,5 +1,5 @@
 # MEMORA AI Android
-Native companion app for user-initiated capture through the Android Sharesheet.
+Native companion app for user-initiated capture through the Android Sharesheet. The package ID is `ai.memora.mobile.sync`, so it installs alongside the first local-only build and does not overwrite that app's stored memories.
 
 ## Features
 - Receives shared plain text from supported apps.
