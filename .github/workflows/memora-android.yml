@@ -1,0 +1,31 @@
+name: MEMORA Android APK
+on:
+  push:
+    paths:
+      - 'memora-source.zip.b64'
+      - '.github/workflows/memora-android.yml'
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore source archive
+        run: |
+          base64 -d memora-source.zip.b64 > memora-source.zip
+          unzip -oq memora-source.zip -d .
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Build debug APK
+        working-directory: android
+        run: gradle :app:assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: memora-ai-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
